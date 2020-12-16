@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import com.example.application.data.AuthResponse;
+import com.example.application.views.account.AccountView;
 import com.example.application.views.login.Login;
 import com.example.application.views.myprofile.MyprofileView;
 import com.example.application.views.photofeed.PhotoFeedView;
@@ -41,7 +42,7 @@ import lombok.Setter;
 
 public class MainView extends AppLayout {
 
-    public static AuthResponse authResponse = new AuthResponse("","", Instant.MIN, "");
+    public static AuthResponse authResponse = new AuthResponse("","", Instant.MIN, "", "");
     private final Tabs menu;
     Button logout = new Button("Logout");
     Anchor userNameLabel = new Anchor();
@@ -55,7 +56,7 @@ public class MainView extends AppLayout {
             header.add(userNameLabel);
             header.add(logout);
             logout.addClickListener(e -> {
-                authResponse = new AuthResponse("","", Instant.MIN, "");
+                authResponse = new AuthResponse("","", Instant.MIN, "", "");
                 //To Do
                 //Delete Token from user
 
@@ -110,7 +111,8 @@ public class MainView extends AppLayout {
                     return new Tab[] {
                             createTab("About", AboutView.class),
                             createTab("Photo feed", PhotoFeedView.class),
-                            createTab("My profile", MyprofileView.class)};
+                            createTab("My profile", MyprofileView.class),
+                            createTab("Account", AccountView.class)};
 
     }
 
