@@ -1,5 +1,6 @@
 package com.example.application.views.account;
 
+import com.example.application.callApi.UserApi;
 import com.example.application.data.entity.User;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.button.Button;
@@ -23,7 +24,7 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Account")
 @CssImport(value = "./styles/views/myprofile/myprofile-view.css", include = "lumo-badge")
 @JsModule("@vaadin/vaadin-lumo-styles/badge.js")
-public class AccountView extends Div implements AfterNavigationObserver {
+public class AccountView extends Div{
 
     private EmailField email = new EmailField("Email address");
     private PasswordField oldPassword = new PasswordField("Old Password");
@@ -32,8 +33,6 @@ public class AccountView extends Div implements AfterNavigationObserver {
 
     private Button save = new Button("Save changes");
     private Binder<User> binder = new Binder(User.class);
-
-    Grid<Person> grid = new Grid<>();
 
     public AccountView() {
         if (MainView.authResponse.getUserName().equals("")) {
@@ -53,46 +52,33 @@ public class AccountView extends Div implements AfterNavigationObserver {
 
             setId("account-view");
             addClassName("account-view");
-//            setSizeFull();
-//            grid.setHeight("100%");
-//            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS);
-//            grid.addComponentColumn(person -> createCard(person));
-            add(grid);
 
             save.addClickListener(e -> {
                 if (oldPassword.isInvalid() || email.isInvalid() ||
                         oldPassword.getValue().equals("") || email.getValue().equals("")) {
-                    Notification.show("Error", 1000, Notification.Position.MIDDLE);
+                    Notification.show("Password or email field empty!", 1000, Notification.Position.MIDDLE);
                 } else {
                     if (newPassword.getValue().equals("")) {
                         Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
+                        UserUpdateDetails userUpdate = new UserUpdateDetails();
+                        userUpdate.setEmail(email.getValue());
+                        userUpdate.setUserName(MainView.authResponse.getUserName());
+                        UserApi.callServiceUpdate(userUpdate);
                     } else {
                         if (newPassword.isInvalid() || verifyPassword.isInvalid() || !newPassword.getValue().equals(verifyPassword.getValue())) {
-                            Notification.show("Error", 1000, Notification.Position.MIDDLE);
+                            Notification.show("Passwords do not match or are invalid!", 1000, Notification.Position.MIDDLE);
                         } else {
+                            UserUpdateDetails userUpdate = new UserUpdateDetails();
+                            userUpdate.setNewPassword(newPassword.getValue());
+                            userUpdate.setOldPassword(oldPassword.getValue());
+                            userUpdate.setUserName(MainView.authResponse.getUserName());
+                            UserApi.callServiceUpdate(userUpdate);
                             Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                         }
                     }
                 }
+
             });
         }
-    }
-
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-    }
-
-    private static Person createPerson(String image, String name, String date, String post, String likes,
-                                       String comments, String shares) {
-        Person p = new Person();
-        p.setImage(image);
-        p.setName(name);
-        p.setDate(date);
-        p.setPost(post);
-        p.setLikes(likes);
-        p.setComments(comments);
-        p.setShares(shares);
-
-        return p;
     }
 }
