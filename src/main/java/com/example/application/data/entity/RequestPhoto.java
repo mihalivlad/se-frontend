@@ -2,6 +2,8 @@ package com.example.application.data.entity;
 
 import lombok.*;
 
+import java.sql.Blob;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import java.sql.Blob;
+
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data

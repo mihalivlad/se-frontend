@@ -1,5 +1,6 @@
 package com.example.application.views.personform;
 
+import com.example.application.callApi.RecommendationApi;
 import com.example.application.callApi.UserApi;
 import com.example.application.data.entity.User;
 import com.vaadin.flow.component.Component;
@@ -37,6 +38,7 @@ public class PersonFormView extends Div {
     private Button signup = new Button("Sign up");
 
     private Binder<User> binder = new Binder(User.class);
+    private RecommendationApi recommendationApi = new RecommendationApi();
 
     public PersonFormView() {
         setId("sign-up-view");
@@ -55,6 +57,7 @@ public class PersonFormView extends Div {
             }else{
                     UserApi.callServiceSignup(new User(email.getValue(), password.getValue(), username.getValue()));
                     Notification.show("User registered!",1000,Position.MIDDLE);
+                    //recommendationApi.initRecom(username.getValue());
                     clearForm();
             }
         });
