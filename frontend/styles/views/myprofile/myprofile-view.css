@@ -5,6 +5,7 @@
 .myprofile-view vaadin-grid,
 .myprofile-view vaadin-grid-cell-content {
   background-color: var(--lumo-contrast-10pct);
+    -ms-layout-flow: horizontal;
 }
 
 .myprofile-view .card {
@@ -15,10 +16,10 @@
 }
 
 .myprofile-view img {
-  border-radius: 50%;
+  border-radius: 1%;
   flex-shrink: 0;
-  height: var(--lumo-size-m);
-  width: var(--lumo-size-m);
+  height: 600px;
+  width: auto;
 }
 
 .myprofile-view .header {
@@ -53,9 +54,4 @@
 }
 
 .myprofile-view .likes,
-.myprofile-view .comments,
-.myprofile-view .shares {
-  color: var(--lumo-tertiary-text-color);
-  font-size: var(--lumo-font-size-xs);
-  margin-right: var(--lumo-space-l);
-}
+.myprofile-view .comments
