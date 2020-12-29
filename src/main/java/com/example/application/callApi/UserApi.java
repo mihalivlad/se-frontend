@@ -48,6 +48,23 @@ public class UserApi {
         return "Unknown error!";
     }
 
+    public static String callServiceDelete(String userName) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(MainView.authResponse.getAuthenticationToken());
+        try {
+            restTemplate.delete("http://localhost:8080/api/account/delete/" + userName, new HttpEntity<>("", headers), String.class);
+            return "Account deleted!";
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                return "Something went wrong!";
+            }
+        } catch (HttpServerErrorException ex) {
+            return "Internal Server Error";
+        }
+        return "Unknown error!";
+    }
+
     public static void refreshToken() throws HttpClientErrorException {
         RefreshTokenData refreshTokenData = new RefreshTokenData();
         refreshTokenData.setRefreshToken(MainView.authResponse.getRefreshToken());

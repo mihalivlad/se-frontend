@@ -8,6 +8,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,7 +28,7 @@ public class AccountView extends Div {
     private PasswordField oldPassword = new PasswordField("Old Password");
     private PasswordField newPassword = new PasswordField("New Password");
     private PasswordField verifyPassword = new PasswordField("Verify New Password");
-
+    private Button delete = new Button("Delete account");
     private Button save = new Button("Save changes");
     private Binder<User> binder = new Binder(User.class);
 
@@ -35,14 +36,17 @@ public class AccountView extends Div {
         if (MainView.authResponse.getUserName().equals("")) {
             add(new Label("You are not login!"));
         } else {
-
             VerticalLayout fl = new VerticalLayout();
+            VerticalLayout flD = new VerticalLayout();
+            flD.add(delete);
             fl.add(email);
             fl.add(oldPassword);
             fl.add(newPassword);
             fl.add(verifyPassword);
             fl.add(save);
+            flD.setAlignItems(FlexComponent.Alignment.END);
             fl.setAlignItems(FlexComponent.Alignment.CENTER);
+            add(flD);
             add(fl);
 
             email.setValue(MainView.authResponse.getEmail());
@@ -50,13 +54,22 @@ public class AccountView extends Div {
             setId("account-view");
             addClassName("account-view");
 
+            delete.addClickListener(e -> {
+                    //UserDeleteDetails userDelete = new UserDeleteDetails();
+                   // userDelete.setUserName();
+                    String response = UserApi.callServiceDelete(MainView.authResponse.getUserName());
+                    if (!response.isEmpty()) {
+                        Notification.show(response, 1000, Notification.Position.MIDDLE);
+                    }
+                    //Notification.show("Account deleted!", 1000, Notification.Position.MIDDLE);
+            });
+
             save.addClickListener(e -> {
                 if (oldPassword.isInvalid() || email.isInvalid() ||
                         oldPassword.getValue().equals("") || email.getValue().equals("")) {
                     Notification.show("Password or email field empty!", 1000, Notification.Position.MIDDLE);
                 } else {
                     if (newPassword.getValue().equals("")) {
-                        Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                         UserUpdateDetails userUpdate = new UserUpdateDetails();
                         userUpdate.setEmail(email.getValue());
                         userUpdate.setUserName(MainView.authResponse.getUserName());
@@ -64,12 +77,12 @@ public class AccountView extends Div {
                         if (!response.isEmpty()) {
                             Notification.show(response, 1000, Notification.Position.MIDDLE);
                         }
+                        Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                     } else {
                         if (newPassword.isInvalid() || verifyPassword.isInvalid() || !newPassword.getValue().equals(verifyPassword.getValue())) {
                             Notification.show("Passwords do not match or are invalid!", 1000, Notification.Position.MIDDLE);
                         } else {
                             UserUpdateDetails userUpdate = new UserUpdateDetails();
-                            Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                             userUpdate.setEmail(email.getValue());
                             userUpdate.setNewPassword(newPassword.getValue());
                             userUpdate.setOldPassword(oldPassword.getValue());
@@ -78,6 +91,7 @@ public class AccountView extends Div {
                             if (!response.isEmpty()) {
                                 Notification.show(response, 1000, Notification.Position.MIDDLE);
                             }
+                            Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                         }
                     }
                 }
