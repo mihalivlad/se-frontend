@@ -1,14 +1,15 @@
 package com.example.application.views.account;
 
 import com.example.application.callApi.UserApi;
+import com.example.application.data.AuthResponse;
 import com.example.application.data.entity.User;
 import com.example.application.views.main.MainView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -17,6 +18,8 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import java.time.Instant;
 
 @Route(value = "account", layout = MainView.class)
 @PageTitle("Account")
@@ -38,6 +41,7 @@ public class AccountView extends Div {
         } else {
             VerticalLayout fl = new VerticalLayout();
             VerticalLayout flD = new VerticalLayout();
+            VerticalLayout flS = new VerticalLayout();
             flD.add(delete);
             fl.add(email);
             fl.add(oldPassword);
@@ -55,13 +59,13 @@ public class AccountView extends Div {
             addClassName("account-view");
 
             delete.addClickListener(e -> {
-                    //UserDeleteDetails userDelete = new UserDeleteDetails();
-                   // userDelete.setUserName();
-                    String response = UserApi.callServiceDelete(MainView.authResponse.getUserName());
-                    if (!response.isEmpty()) {
-                        Notification.show(response, 1000, Notification.Position.MIDDLE);
-                    }
-                    //Notification.show("Account deleted!", 1000, Notification.Position.MIDDLE);
+
+                String response = UserApi.callServiceDelete(MainView.authResponse.getUserName());
+                if (!response.isEmpty()) {
+                    Notification.show(response, 1000, Notification.Position.MIDDLE);
+                }
+                MainView.authResponse = new AuthResponse("","", Instant.MIN, "", "");
+                UI.getCurrent().getPage().setLocation("http://localhost:4200/sign-up");
             });
 
             save.addClickListener(e -> {
