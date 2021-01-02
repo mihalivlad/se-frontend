@@ -1,8 +1,10 @@
 package com.example.application.views.login;
 
+import com.example.application.callApi.RecommendationApi;
 import com.example.application.callApi.UserApi;
 import com.example.application.data.LoginModel;
 import com.example.application.views.main.MainView;
+import com.example.application.views.photofeed.PhotoFeedView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Anchor;
@@ -40,6 +42,9 @@ public class Login extends Div {
             try {
                 MainView.authResponse = UserApi.callServiceLogin(new LoginModel(e.getUsername(), e.getPassword()));
                 UI.getCurrent().getPage().setLocation("http://localhost:4200/photo-feed");
+                RecommendationApi recommendationApi = new RecommendationApi();
+                PhotoFeedView.setIndex(recommendationApi.getIndex());
+                PhotoFeedView.setMaxIndex(PhotoFeedView.getIndex());
             } catch (HttpClientErrorException ex) {
                 if (ex.getRawStatusCode() == 403) {
                     Notification.show("username or password invalid", 2000, Position.MIDDLE);

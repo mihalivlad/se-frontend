@@ -30,6 +30,11 @@ public class PhotoApi {
         return Arrays.asList(photoModelsArray);
     }
 
+    public List<PhotoModel> getAllByUsername(String username){
+        PhotoModel[] photoModelsArray = restTemplate.getForObject("http://localhost:8080/photo/user/?username="+username, PhotoModel[].class);
+        return Arrays.asList(photoModelsArray);
+    }
+
 
 
     public PhotoModel addPhoto(byte[] imageData, String description) throws IOException {

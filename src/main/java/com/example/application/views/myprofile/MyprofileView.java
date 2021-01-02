@@ -21,8 +21,12 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.IronIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
@@ -46,22 +50,22 @@ import javax.imageio.stream.ImageInputStream;
 public class MyprofileView extends Div implements AfterNavigationObserver {
 
     Grid<PhotoModel> grid = new Grid<>();
-    Button button = new Button("post");
+    Button button = new Button("Post");
     Div output = new Div();
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     Upload upload = new Upload(buffer);
-    Button showButton = new Button("Show");
+    //Button showButton = new Button("Show");
     private boolean enableUpload = true;
     private String filename;
     private PhotoApi photoApi = new PhotoApi();
     private List<PhotoModel> photoModels;
+    private TextArea description = new TextArea("Description");
 
     public MyprofileView() {
         if(MainView.authResponse.getUserName().equals("")){
             add(new Label("You are not login"));
         }else {
-
-            add(showButton);
+            add(description);
             upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
 
             upload.addSucceededListener(event -> {
@@ -87,15 +91,19 @@ public class MyprofileView extends Div implements AfterNavigationObserver {
             button.addClickListener(e->{
                 try {
                     byte[] bytes = IOUtils.toByteArray(buffer.getInputStream(filename));
-                    photoApi.addPhoto(bytes, "aaaaa");
-                    photoModels.add(photoApi.getLast(photoApi.getAllByUsername()));//
-                    grid.setItems(photoModels);
+                    photoApi.addPhoto(bytes, description.getValue());
+                    //photoModels.add(photoApi.getLast(photoApi.getAllByUsername()));//
+                    //grid.setItems(photoModels);
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
+                Notification.show("Post was uploaded!", 2000, Notification.Position.MIDDLE);
+                UI.getCurrent().getPage().reload();
             });
         }
     }
+
+
 
 //    private HorizontalLayout createCard(Person person) {
 //        HorizontalLayout card = new HorizontalLayout();
@@ -318,6 +326,7 @@ public class MyprofileView extends Div implements AfterNavigationObserver {
 
         // Set some data when this view is displayed.
         photoModels = photoApi.getAllByUsername();
+        Collections.reverse(photoModels);
         for (PhotoModel photoModel: photoModels) {
             photoModel.setPicture(photoApi.getImage(photoModel.getId()));
         }
@@ -325,19 +334,7 @@ public class MyprofileView extends Div implements AfterNavigationObserver {
         grid.setItems(photoModels);
     }
 
-    private static Person createPerson(String image, String name, String date, String post, String likes,
-                                       String comments, String shares) {
-        Person p = new Person();
-        p.setImage(image);
-        p.setName(name);
-        p.setDate(date);
-        p.setPost(post);
-        p.setLikes(likes);
-        p.setComments(comments);
-        p.setShares(shares);
 
-        return p;
-    }
 
 
 

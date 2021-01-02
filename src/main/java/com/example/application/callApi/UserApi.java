@@ -13,6 +13,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class UserApi {
     private RestTemplate restTemplate;
 
@@ -72,5 +75,11 @@ public class UserApi {
         RestTemplate restTemplate = new RestTemplate();
         AuthResponse authResponse = restTemplate.postForObject("http://localhost:8080/api/auth/refresh/token", refreshTokenData, AuthResponse.class);
         MainView.authResponse.setAuthenticationToken(authResponse.getAuthenticationToken());
+    }
+
+    public static List<String> getAllUsers(){
+        RestTemplate restTemplate = new RestTemplate();
+        return Arrays.asList(restTemplate.getForObject("http://localhost:8080/api/account/usernames", String[].class));
+
     }
 }

@@ -6,6 +6,7 @@ import com.example.application.data.entity.User;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
@@ -13,11 +14,18 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.Autocomplete;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.web.client.HttpServerErrorException;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import java.time.Instant;
 
@@ -31,7 +39,13 @@ public class AccountView extends Div {
     private PasswordField oldPassword = new PasswordField("Old Password");
     private PasswordField newPassword = new PasswordField("New Password");
     private PasswordField verifyPassword = new PasswordField("Verify New Password");
+
     private Button delete = new Button("Delete account");
+
+    private ComboBox<String> search = new ComboBox<>("User");
+    private Button searchButton = new Button("search");
+
+
     private Button save = new Button("Save changes");
     private Binder<User> binder = new Binder(User.class);
 
@@ -39,6 +53,24 @@ public class AccountView extends Div {
         if (MainView.authResponse.getUserName().equals("")) {
             add(new Label("You are not login!"));
         } else {
+
+
+            List<String> usernames = UserApi.getAllUsers().stream().filter(Objects::nonNull).collect(Collectors.toList());
+            usernames.remove("");
+            search.setItems(usernames);
+            add(search);
+            add(searchButton);
+            add(new Label("\n\n\n\n"));
+            searchButton.addClickListener(e->{
+                try {
+                    UI.getCurrent().navigate("username/" + search.getValue());
+                }catch (HttpServerErrorException ex){
+                    UI.getCurrent().navigate("account");
+                    Notification.show("username invalid", 2000, Notification.Position.MIDDLE);
+                }
+            });
+
+
             VerticalLayout fl = new VerticalLayout();
             VerticalLayout flD = new VerticalLayout();
             VerticalLayout flS = new VerticalLayout();
