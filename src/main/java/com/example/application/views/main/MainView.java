@@ -3,8 +3,11 @@ package com.example.application.views.main;
 import java.time.Instant;
 import java.util.Optional;
 
+import com.example.application.callApi.RecommendationApi;
+import com.example.application.callApi.UserApi;
 import com.example.application.data.AuthResponse;
 import com.example.application.views.account.AccountView;
+import com.example.application.views.friendFeed.FriendFeed;
 import com.example.application.views.login.Login;
 import com.example.application.views.myprofile.MyprofileView;
 import com.example.application.views.photofeed.PhotoFeedView;
@@ -56,10 +59,9 @@ public class MainView extends AppLayout {
             header.add(userNameLabel);
             header.add(logout);
             logout.addClickListener(e -> {
+                RecommendationApi recommendationApi = new RecommendationApi();
+                recommendationApi.setIndex(PhotoFeedView.getMaxIndex());
                 authResponse = new AuthResponse("","", Instant.MIN, "", "");
-                //To Do
-                //Delete Token from user
-
                 UI.getCurrent().getPage().setLocation("http://localhost:4200/sign-up");
             });
         }
@@ -111,6 +113,7 @@ public class MainView extends AppLayout {
                     return new Tab[] {
                             createTab("About", AboutView.class),
                             createTab("Photo feed", PhotoFeedView.class),
+                            createTab("Friend feed", FriendFeed.class),
                             createTab("My profile", MyprofileView.class),
                             createTab("Account", AccountView.class)};
 

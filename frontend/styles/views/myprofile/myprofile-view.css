@@ -16,10 +16,12 @@
 }
 
 .myprofile-view img {
-  border-radius: 1%;
-  flex-shrink: 0;
-  height: 600px;
-  width: auto;
+    border-radius: 1%;
+    flex-shrink: 0;
+    height: 30em;
+    max-height: 30em;
+    width: auto;
+    max-width: 70em;
 }
 
 .myprofile-view .header {
@@ -54,4 +56,9 @@
 }
 
 .myprofile-view .likes,
-.myprofile-view .comments
+.myprofile-view .dislikes,
+.myprofile-view .comments{
+    color: var(--lumo-tertiary-text-color);
+    font-size: var(--lumo-font-size-xs);
+    margin-right: var(--lumo-space-l);
+}

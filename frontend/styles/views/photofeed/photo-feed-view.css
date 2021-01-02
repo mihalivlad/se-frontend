@@ -15,10 +15,12 @@
 }
 
 .photo-feed-view img {
-  border-radius: 50%;
-  flex-shrink: 0;
-  height: var(--lumo-size-m);
-  width: var(--lumo-size-m);
+    border-radius: 1%;
+    flex-shrink: 0;
+    height: 30em;
+    max-height: 30em;
+    width: auto;
+    max-width: 70em;
 }
 
 .photo-feed-view .header {
@@ -53,6 +55,7 @@
 }
 
 .photo-feed-view .likes,
+.myprofile-view .dislikes,
 .photo-feed-view .comments,
 .photo-feed-view .shares {
   color: var(--lumo-tertiary-text-color);
