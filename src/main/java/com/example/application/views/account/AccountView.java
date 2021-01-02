@@ -1,6 +1,7 @@
 package com.example.application.views.account;
 
 import com.example.application.callApi.UserApi;
+import com.example.application.data.AuthResponse;
 import com.example.application.data.entity.User;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.UI;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import java.time.Instant;
+
 @Route(value = "account", layout = MainView.class)
 @PageTitle("Account")
 @CssImport(value = "./styles/views/myprofile/myprofile-view.css", include = "lumo-badge")
@@ -36,6 +39,9 @@ public class AccountView extends Div {
     private PasswordField oldPassword = new PasswordField("Old Password");
     private PasswordField newPassword = new PasswordField("New Password");
     private PasswordField verifyPassword = new PasswordField("Verify New Password");
+
+    private Button delete = new Button("Delete account");
+
     private ComboBox<String> search = new ComboBox<>("User");
     private Button searchButton = new Button("search");
 
@@ -47,6 +53,8 @@ public class AccountView extends Div {
         if (MainView.authResponse.getUserName().equals("")) {
             add(new Label("You are not login!"));
         } else {
+
+
             List<String> usernames = UserApi.getAllUsers().stream().filter(Objects::nonNull).collect(Collectors.toList());
             usernames.remove("");
             search.setItems(usernames);
@@ -62,13 +70,19 @@ public class AccountView extends Div {
                 }
             });
 
+
             VerticalLayout fl = new VerticalLayout();
+            VerticalLayout flD = new VerticalLayout();
+            VerticalLayout flS = new VerticalLayout();
+            flD.add(delete);
             fl.add(email);
             fl.add(oldPassword);
             fl.add(newPassword);
             fl.add(verifyPassword);
             fl.add(save);
+            flD.setAlignItems(FlexComponent.Alignment.END);
             fl.setAlignItems(FlexComponent.Alignment.CENTER);
+            add(flD);
             add(fl);
 
             email.setValue(MainView.authResponse.getEmail());
@@ -76,13 +90,22 @@ public class AccountView extends Div {
             setId("account-view");
             addClassName("account-view");
 
+            delete.addClickListener(e -> {
+
+                String response = UserApi.callServiceDelete(MainView.authResponse.getUserName());
+                if (!response.isEmpty()) {
+                    Notification.show(response, 1000, Notification.Position.MIDDLE);
+                }
+                MainView.authResponse = new AuthResponse("","", Instant.MIN, "", "");
+                UI.getCurrent().getPage().setLocation("http://localhost:4200/sign-up");
+            });
+
             save.addClickListener(e -> {
                 if (oldPassword.isInvalid() || email.isInvalid() ||
                         oldPassword.getValue().equals("") || email.getValue().equals("")) {
                     Notification.show("Password or email field empty!", 1000, Notification.Position.MIDDLE);
                 } else {
                     if (newPassword.getValue().equals("")) {
-                        Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                         UserUpdateDetails userUpdate = new UserUpdateDetails();
                         userUpdate.setEmail(email.getValue());
                         userUpdate.setUserName(MainView.authResponse.getUserName());
@@ -90,12 +113,12 @@ public class AccountView extends Div {
                         if (!response.isEmpty()) {
                             Notification.show(response, 1000, Notification.Position.MIDDLE);
                         }
+                        Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                     } else {
                         if (newPassword.isInvalid() || verifyPassword.isInvalid() || !newPassword.getValue().equals(verifyPassword.getValue())) {
                             Notification.show("Passwords do not match or are invalid!", 1000, Notification.Position.MIDDLE);
                         } else {
                             UserUpdateDetails userUpdate = new UserUpdateDetails();
-                            Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                             userUpdate.setEmail(email.getValue());
                             userUpdate.setNewPassword(newPassword.getValue());
                             userUpdate.setOldPassword(oldPassword.getValue());
@@ -104,6 +127,7 @@ public class AccountView extends Div {
                             if (!response.isEmpty()) {
                                 Notification.show(response, 1000, Notification.Position.MIDDLE);
                             }
+                            Notification.show("Changes saved!", 1000, Notification.Position.MIDDLE);
                         }
                     }
                 }
