@@ -1,9 +1,9 @@
-package com.example.application.views.photofeed;
+package com.example.application.views.friendFeed;
+
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 import com.example.application.callApi.PhotoApi;
@@ -21,6 +21,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.IronIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -31,15 +32,14 @@ import com.example.application.views.main.MainView;
 import com.vaadin.flow.server.StreamResource;
 import org.hibernate.procedure.spi.ParameterRegistrationImplementor;
 
-@Route(value = "photo-feed", layout = MainView.class)
-@PageTitle("Photo Feed")
+@Route(value = "friend-feed", layout = MainView.class)
+@PageTitle("Friend Feed")
 @CssImport(value = "./styles/views/photofeed/photo-feed-view.css", include = "lumo-badge")
 @JsModule("@vaadin/vaadin-lumo-styles/badge.js")
-public class PhotoFeedView extends Div {
+public class FriendFeed extends Div {
 
     Grid<PhotoModel> grid = new Grid<>();
-    private static int index;
-    private static int maxIndex;
+    private int index;
     private List<PhotoModel> photoModelList = new ArrayList<>();
     private Button next = new Button(">");
     private Button prev = new Button("<");
@@ -48,71 +48,61 @@ public class PhotoFeedView extends Div {
     private HorizontalLayout card =new HorizontalLayout();
     private PhotoModel photoModel;
 
-    public PhotoFeedView() {
+    public FriendFeed() {
         if(MainView.authResponse.getUserName().equals("")){
             add(new Label("You are not login"));
         }else{
-
-            photoModelList = recommendationApi.getRecom();
-            for (PhotoModel photoModel: photoModelList) {
-                //photoModel.setUser(new User(photoApi.getUsername(photoModel)));
-                photoApi.getUsername(photoModel);
+            index = 0;
+            List<String> friends = recommendationApi.getFollow();
+            for (String username:friends) {
+                photoModelList.addAll(photoApi.getAllByUsername(username));
             }
-            setId("photo-feed-view");
-            addClassName("photo-feed-view");
-            setSizeFull();
-            grid.setHeight("100%");
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS);
-            photoModel = photoModelList.get(index);
-            photoModel.setPicture(photoApi.getImage(photoModel.getId()));
-            createCard(photoModel);
-            add(prev);
-            add(card);
-            add(next);
-            prev.addClickListener(e->{
-                next.setVisible(true);
-                try {
-                    photoModel = photoModelList.get(index-1);
-                    photoModel.setPicture(photoApi.getImage(photoModel.getId()));
-                    createCard(photoModel);
-                    index--;
-                }catch (IndexOutOfBoundsException ex){
-                    prev.setVisible(false);
+            try {
+                photoModelList.sort(Comparator.comparingLong(PhotoModel::getId).reversed());
+                for (PhotoModel photoModel : photoModelList) {
+                    //photoModel.setUser(new User(photoApi.getUsername(photoModel)));
+                    photoApi.getUsername(photoModel);
                 }
-            });
-            next.addClickListener(e->{
-                prev.setVisible(true);
-                try {
-                    photoModel = photoModelList.get(index+1);
-                    photoModel.setPicture(photoApi.getImage(photoModel.getId()));
-                    createCard(photoModel);
-                    index++;
-                    if(index > maxIndex) {
-                        maxIndex=index;
+                setId("photo-feed-view");
+                addClassName("photo-feed-view");
+                setSizeFull();
+                grid.setHeight("100%");
+                grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS);
+                photoModel = photoModelList.get(index);
+                photoModel.setPicture(photoApi.getImage(photoModel.getId()));
+                createCard(photoModel);
+                add(prev);
+                add(card);
+                add(next);
+                prev.addClickListener(e->{
+                    next.setVisible(true);
+                    try {
+                        photoModel = photoModelList.get(index-1);
+                        photoModel.setPicture(photoApi.getImage(photoModel.getId()));
+                        createCard(photoModel);
+                        index--;
+                    }catch (IndexOutOfBoundsException ex){
+                        prev.setVisible(false);
                     }
-                }catch (IndexOutOfBoundsException ex){
-                    next.setVisible(false);
-                }
-            });
+                });
+                next.addClickListener(e->{
+                    prev.setVisible(true);
+                    try {
+                        photoModel = photoModelList.get(index+1);
+                        photoModel.setPicture(photoApi.getImage(photoModel.getId()));
+                        createCard(photoModel);
+                        index++;
+                    }catch (IndexOutOfBoundsException ex){
+                        next.setVisible(false);
+                        //Notification.show("!", 2000, Notification.Position.MIDDLE);
+                    }
+                });
+            }catch (IndexOutOfBoundsException ex){
+                add(new Label("You have no friends"));
+            }
 
         }
 
-    }
-
-    public static int getMaxIndex() {
-        return maxIndex;
-    }
-
-    public static void setMaxIndex(int maxIndex) {
-        PhotoFeedView.maxIndex = maxIndex;
-    }
-
-    public static int getIndex() {
-        return index;
-    }
-
-    public static void setIndex(int index) {
-        PhotoFeedView.index = index;
     }
 
     private void createCard(PhotoModel photoModel) {
@@ -215,3 +205,4 @@ public class PhotoFeedView extends Div {
 
 
 }
+
