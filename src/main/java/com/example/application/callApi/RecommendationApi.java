@@ -8,7 +8,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class RecommendationApi {
 
@@ -18,11 +17,6 @@ public class RecommendationApi {
         PhotoModel[] photoModelsArray = restTemplate.getForObject("http://localhost:8080/recom/?username="+ MainView.authResponse.getUserName(), PhotoModel[].class);
         return Arrays.asList(photoModelsArray);
     }
-
-    //public List<PhotoModel> initRecom(String username){
-    //    PhotoModel[] photoModelsArray = restTemplate.postForObject("http://localhost:8080/recom/",username, PhotoModel[].class);
-    //    return Arrays.asList(photoModelsArray);
-   // }
 
     public Integer getIndex(){
         return restTemplate.getForObject("http://localhost:8080/recom/index?username="+ MainView.authResponse.getUserName(), Integer.class);

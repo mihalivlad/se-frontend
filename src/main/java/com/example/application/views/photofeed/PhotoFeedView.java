@@ -1,35 +1,26 @@
 package com.example.application.views.photofeed;
 
-import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.example.application.callApi.PhotoApi;
 import com.example.application.callApi.RecommendationApi;
 import com.example.application.data.PhotoModel;
-import com.example.application.data.entity.User;
+import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.IronIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.example.application.views.main.MainView;
 import com.vaadin.flow.server.StreamResource;
-import org.hibernate.procedure.spi.ParameterRegistrationImplementor;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Route(value = "photo-feed", layout = MainView.class)
 @PageTitle("Photo Feed")
@@ -45,58 +36,59 @@ public class PhotoFeedView extends Div {
     private Button prev = new Button("<");
     private PhotoApi photoApi = new PhotoApi();
     private RecommendationApi recommendationApi = new RecommendationApi();
-    private HorizontalLayout card =new HorizontalLayout();
+    private HorizontalLayout card = new HorizontalLayout();
     private PhotoModel photoModel;
 
     public PhotoFeedView() {
-        if(MainView.authResponse.getUserName().equals("")){
+        if (MainView.authResponse.getUserName().equals("")) {
             add(new Label("You are not login"));
-        }else{
-
-            photoModelList = recommendationApi.getRecom();
-            for (PhotoModel photoModel: photoModelList) {
-                //photoModel.setUser(new User(photoApi.getUsername(photoModel)));
-                photoApi.getUsername(photoModel);
-            }
-            setId("photo-feed-view");
-            addClassName("photo-feed-view");
-            setSizeFull();
-            grid.setHeight("100%");
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS);
-            photoModel = photoModelList.get(index);
-            photoModel.setPicture(photoApi.getImage(photoModel.getId()));
-            createCard(photoModel);
-            add(prev);
-            add(card);
-            add(next);
-            prev.addClickListener(e->{
-                next.setVisible(true);
-                try {
-                    photoModel = photoModelList.get(index-1);
-                    photoModel.setPicture(photoApi.getImage(photoModel.getId()));
-                    createCard(photoModel);
-                    index--;
-                }catch (IndexOutOfBoundsException ex){
-                    prev.setVisible(false);
+        } else {
+            try {
+                photoModelList = recommendationApi.getRecom();
+                for (PhotoModel photoModel : photoModelList) {
+                    photoApi.getUsername(photoModel);
                 }
-            });
-            next.addClickListener(e->{
-                prev.setVisible(true);
-                try {
-                    photoModel = photoModelList.get(index+1);
-                    photoModel.setPicture(photoApi.getImage(photoModel.getId()));
-                    createCard(photoModel);
-                    index++;
-                    if(index > maxIndex) {
-                        maxIndex=index;
+                setId("photo-feed-view");
+                addClassName("photo-feed-view");
+                setSizeFull();
+                grid.setHeight("100%");
+                grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS);
+                photoModel = photoModelList.get(index);
+                photoModel.setPicture(photoApi.getImage(photoModel.getId()));
+                createCard(photoModel);
+                add(prev);
+                add(card);
+                add(next);
+                prev.addClickListener(e -> {
+                    next.setVisible(true);
+                    try {
+                        photoModel = photoModelList.get(index - 1);
+                        photoModel.setPicture(photoApi.getImage(photoModel.getId()));
+                        createCard(photoModel);
+                        index--;
+                    } catch (IndexOutOfBoundsException ex) {
+                        prev.setVisible(false);
                     }
-                }catch (IndexOutOfBoundsException ex){
-                    next.setVisible(false);
-                }
-            });
+                });
+                next.addClickListener(e -> {
+                    prev.setVisible(true);
+                    try {
+                        photoModel = photoModelList.get(index + 1);
+                        photoModel.setPicture(photoApi.getImage(photoModel.getId()));
+                        createCard(photoModel);
+                        index++;
+                        if (index > maxIndex) {
+                            maxIndex = index;
+                        }
+                    } catch (IndexOutOfBoundsException ex) {
+                        next.setVisible(false);
+                    }
+                });
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                add(new Label("No posts available!"));
+            }
 
         }
-
     }
 
     public static int getMaxIndex() {
@@ -116,7 +108,6 @@ public class PhotoFeedView extends Div {
     }
 
     private void createCard(PhotoModel photoModel) {
-        //photoApi.getBy(photoModel);
         photoApi.setDislikes(photoModel);
         photoApi.setLikes(photoModel);
         card.addClassName("card");
@@ -135,11 +126,9 @@ public class PhotoFeedView extends Div {
         header.setSpacing(false);
         header.getThemeList().add("spacing-s");
 
-        Anchor name = new Anchor("http://localhost:4200/username/"+photoModel.getUser().getUserName()
-                ,photoModel.getUser().getUserName());
+        Anchor name = new Anchor("http://localhost:4200/username/" + photoModel.getUser().getUserName()
+                , photoModel.getUser().getUserName());
         name.addClassName("name");
-//        Span date = new Span(person.getDate());
-//        date.addClassName("date");
         header.add(name);
 
         Span post = new Span(photoModel.getDescription());
@@ -150,59 +139,59 @@ public class PhotoFeedView extends Div {
         actions.setSpacing(false);
         actions.getThemeList().add("spacing-s");
         Icon likeIcon = new Icon(VaadinIcon.THUMBS_UP);
-        if(photoApi.isLike(photoModel)){
+        if (photoApi.isLike(photoModel)) {
             likeIcon.setColor("green");
-        }else {
+        } else {
             likeIcon.setColor("black");
         }
         Span likes = new Span(String.valueOf(photoModel.getLikes()));
         likes.addClassName("likes");
         Icon dislikeIcon = new Icon(VaadinIcon.THUMBS_DOWN);
-        if(photoApi.isDislike(photoModel)){
+        if (photoApi.isDislike(photoModel)) {
             dislikeIcon.setColor("red");
-        }else {
+        } else {
             dislikeIcon.setColor("black");
         }
         Span dislikes = new Span(String.valueOf(photoModel.getDislikes()));
         dislikes.addClassName("dislikes");
         actions.add(likeIcon, likes, dislikeIcon, dislikes);
-        likeIcon.addClickListener(e->{
-            if(likeIcon.getColor().equals("green")){
+        likeIcon.addClickListener(e -> {
+            if (likeIcon.getColor().equals("green")) {
                 likeIcon.setColor("black");
-                photoModel.setLikes(photoModel.getLikes()-1);
+                photoModel.setLikes(photoModel.getLikes() - 1);
                 likes.setText(String.valueOf(photoModel.getLikes()));
                 photoApi.updateLike(photoModel);
-            }else {
+            } else {
                 likeIcon.setColor("green");
-                photoModel.setLikes(photoModel.getLikes()+1);
+                photoModel.setLikes(photoModel.getLikes() + 1);
                 likes.setText(String.valueOf(photoModel.getLikes()));
-                if(dislikeIcon.getColor().equals("red")) {
-                    photoModel.setDislikes(photoModel.getDislikes()-1);
+                if (dislikeIcon.getColor().equals("red")) {
+                    photoModel.setDislikes(photoModel.getDislikes() - 1);
                     dislikes.setText(String.valueOf(photoModel.getDislikes()));
                     dislikeIcon.setColor("black");
                     photoApi.updateLikeDislike(photoModel);
-                }else{
+                } else {
                     photoApi.updateLike(photoModel);
                 }
             }
         });
 
-        dislikeIcon.addClickListener(e->{
-            if(dislikeIcon.getColor().equals("red")){
+        dislikeIcon.addClickListener(e -> {
+            if (dislikeIcon.getColor().equals("red")) {
                 dislikeIcon.setColor("black");
-                photoModel.setDislikes(photoModel.getDislikes()-1);
+                photoModel.setDislikes(photoModel.getDislikes() - 1);
                 dislikes.setText(String.valueOf(photoModel.getDislikes()));
                 photoApi.updateDislike(photoModel);
-            }else {
+            } else {
                 dislikeIcon.setColor("red");
-                photoModel.setDislikes(photoModel.getDislikes()+1);
+                photoModel.setDislikes(photoModel.getDislikes() + 1);
                 dislikes.setText(String.valueOf(photoModel.getDislikes()));
-                if(likeIcon.getColor().equals("green")) {
-                    photoModel.setLikes(photoModel.getLikes()-1);
+                if (likeIcon.getColor().equals("green")) {
+                    photoModel.setLikes(photoModel.getLikes() - 1);
                     likes.setText(String.valueOf(photoModel.getLikes()));
                     likeIcon.setColor("black");
                     photoApi.updateLikeDislike(photoModel);
-                }else{
+                } else {
                     photoApi.updateDislike(photoModel);
                 }
             }

@@ -47,8 +47,6 @@ public class PersonFormView extends Div {
         add(createFormLayout());
         add(createButtonLayout());
 
-        //binder.bindInstanceFields(this);
-
         clearForm();
         signup.addClickListener(e -> {
             if(username.isInvalid() || email.isInvalid() || password.isInvalid() || verifyPassword.isInvalid() ||
@@ -57,7 +55,6 @@ public class PersonFormView extends Div {
             }else{
                     UserApi.callServiceSignup(new User(email.getValue(), password.getValue(), username.getValue()));
                     Notification.show("User registered!",1000,Position.MIDDLE);
-                    //recommendationApi.initRecom(username.getValue());
                     clearForm();
             }
         });
@@ -91,34 +88,25 @@ public class PersonFormView extends Div {
 
 
         binder.forField(username)
-                // Define the validator
                 .withValidator(
                         name -> name.length() >= 3, username.getErrorMessage())
-                // Define how the validation status is displayed
                 .withValidationStatusHandler(status -> {
                     username.setInvalid(status.isError());
                 })
-                // Finalize the binding
                 .bind(User::getUserName, User::setUserName);
         binder.forField(password)
-                // Define the validator
                 .withValidator(
                         password -> password.equals(verifyPassword.getValue()), password.getErrorMessage())
-                // Define how the validation status is displayed
                 .withValidationStatusHandler(status -> {
                     password.setInvalid(status.isError());
                 })
-                // Finalize the binding
                 .bind(User::getPassword, User::setPassword);
         binder.forField(verifyPassword)
-                // Define the validator
                 .withValidator(
                         verifyPassword -> verifyPassword.equals(password.getValue()), password.getErrorMessage())
-                // Define how the validation status is displayed
                 .withValidationStatusHandler(status -> {
                     password.setInvalid(status.isError());
                 })
-                // Finalize the binding
                 .bind(User::getPassword, User::setPassword);
     }
 

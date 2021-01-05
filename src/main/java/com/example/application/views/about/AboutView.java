@@ -14,7 +14,9 @@ public class AboutView extends Div {
 
     public AboutView() {
         setId("about-view");
-        add(new Label("Content placeholder"));
+        add(new Label("The project is a further development of the miniproject. We developed a so-\n" +
+                "cializing application named VAD, in which every user is the main actor from\n" +
+                "his/her point of view."));
     }
 
 }

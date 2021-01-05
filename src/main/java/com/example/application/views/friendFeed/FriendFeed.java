@@ -1,7 +1,5 @@
 package com.example.application.views.friendFeed;
 
-
-import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.List;
@@ -9,7 +7,6 @@ import java.util.List;
 import com.example.application.callApi.PhotoApi;
 import com.example.application.callApi.RecommendationApi;
 import com.example.application.data.PhotoModel;
-import com.example.application.data.entity.User;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -19,18 +16,13 @@ import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.IronIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.server.StreamResource;
-import org.hibernate.procedure.spi.ParameterRegistrationImplementor;
 
 @Route(value = "friend-feed", layout = MainView.class)
 @PageTitle("Friend Feed")
@@ -106,7 +98,6 @@ public class FriendFeed extends Div {
     }
 
     private void createCard(PhotoModel photoModel) {
-        //photoApi.getBy(photoModel);
         photoApi.setDislikes(photoModel);
         photoApi.setLikes(photoModel);
         card.addClassName("card");
@@ -128,8 +119,6 @@ public class FriendFeed extends Div {
         Anchor name = new Anchor("http://localhost:4200/username/"+photoModel.getUser().getUserName()
                 ,photoModel.getUser().getUserName());
         name.addClassName("name");
-//        Span date = new Span(person.getDate());
-//        date.addClassName("date");
         header.add(name);
 
         Span post = new Span(photoModel.getDescription());

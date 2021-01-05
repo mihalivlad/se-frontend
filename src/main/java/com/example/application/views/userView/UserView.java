@@ -106,8 +106,6 @@ public class UserView extends Div
 
         Span name = new Span(username);
         name.addClassName("name");
-//        Span date = new Span(person.getDate());
-//        date.addClassName("date");
         header.add(name);
 
         Span post = new Span(photoModel.getDescription());
